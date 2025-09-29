@@ -1,6 +1,6 @@
 #!/bin/bash
 
-_USER_=$( ( awk '/--user/ { print $2 }' < $HOME/.config/mosquitto_pub ; echo user ) | head -1 )
+_USER_=$( ( awk '/-u / { print $2 }' < $HOME/.config/mosquitto_pub ; echo user ) | head -1 )
 _HOSTNAME_=$( hostname )
 
 TOPIC=computers/$_USER_/$_HOSTNAME_/uname
