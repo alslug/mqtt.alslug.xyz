@@ -9,7 +9,7 @@ OLD=$( mosquitto_sub -W 1 -C 1				--topic $TOPIC	)
 [ x"$NEW" != x"$OLD" ] && echo "$NEW"	| mosquitto_pub	--topic $TOPIC -s --retain
 
 
-for PACKAGE in linux-image-generic linux-headers-rpi-v6 linux-headers-rpi-v7 linux-headers-rpi-v7l ; do
+for PACKAGE in linux-image-generic linux-headers-rpi-v6 linux-headers-rpi-v7 linux-headers-rpi-v7l linux-image-rpi-v8:arm64 ; do
 	TOPIC=computers/$_USER_/$_HOSTNAME_/$PACKAGE
 	NEW=$( dpkg -l $PACKAGE | awk '/'$PACKAGE'/ { print $3 }'	)
 	OLD=$( mosquitto_sub -W 1 -C 1				--topic $TOPIC	)
