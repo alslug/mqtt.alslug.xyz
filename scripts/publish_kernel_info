@@ -5,11 +5,11 @@ _HOSTNAME_=$( hostname )
 
 TOPIC=computers/$_USER_/$_HOSTNAME_/uname
 NEW=$( uname -a)
-OLD=$( mosquitto_sub -C 1				--topic $TOPIC	)
+OLD=$( mosquitto_sub -W 1 -C 1				--topic $TOPIC	)
 [ xx"$NEW" != x"$OLD" ] && echo "$NEW"	| mosquitto_pub	--topic $TOPIC -s --retain
 
 
 TOPIC=computers/$_USER_/$_HOSTNAME_/linux-image-generic
 NEW=$( dpkg -l linux-image-generic | awk '/linux-image-generic/ { print $3 }'	)
-OLD=$( mosquitto_sub -C 1				--topic $TOPIC	)
+OLD=$( mosquitto_sub -W 1 -C 1				--topic $TOPIC	)
 [ xx"$NEW" != x"$OLD" ] && echo "$NEW"	| mosquitto_pub	--topic $TOPIC -s --retain
