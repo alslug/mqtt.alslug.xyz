@@ -6,10 +6,13 @@ _HOSTNAME_=$( hostname )
 TOPIC=computers/$_USER_/$_HOSTNAME_/uname
 NEW=$( uname -a)
 OLD=$( mosquitto_sub -W 1 -C 1				--topic $TOPIC	)
-[ xx"$NEW" != x"$OLD" ] && echo "$NEW"	| mosquitto_pub	--topic $TOPIC -s --retain
+[ x"$NEW" != x"$OLD" ] && echo "$NEW"	| mosquitto_pub	--topic $TOPIC -s --retain
 
 
-TOPIC=computers/$_USER_/$_HOSTNAME_/linux-image-generic
-NEW=$( dpkg -l linux-image-generic | awk '/linux-image-generic/ { print $3 }'	)
-OLD=$( mosquitto_sub -W 1 -C 1				--topic $TOPIC	)
-[ xx"$NEW" != x"$OLD" ] && echo "$NEW"	| mosquitto_pub	--topic $TOPIC -s --retain
+for PACKAGE in linux-image-generic linux-headers-rpi-v6 linux-headers-rpi-v7 linux-headers-rpi-v6l ; do
+	TOPIC=computers/$_USER_/$_HOSTNAME_/$PACKAGE
+	NEW=$( dpkg -l $PACKAGE | awk '/'$PACKAGE'/ { print $3 }'	)
+	OLD=$( mosquitto_sub -W 1 -C 1				--topic $TOPIC	)
+	[ x"$NEW" != x ] &&
+	[ x"$NEW" != x"$OLD" ] && echo "$NEW"	| mosquitto_pub	--topic $TOPIC -s --retain
+done
