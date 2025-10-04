@@ -3,7 +3,7 @@
 _USER_=$( ( awk '/-u / { print $2 }' < $HOME/.config/mosquitto.mqtt.alslug.xyz.conf ; echo user ) | head -1 )
 
 function update {
-	_MOSQUITTO_PARAMS_="--host mqtt.alslug.xyz -u $_USER_ -topic "computers/$_USER_/$( hostname )/$1
+	_MOSQUITTO_PARAMS_="--host mqtt.alslug.xyz -u $_USER_ --topic "computers/$_USER_/$( hostname )/$1
 	NEW=$2
 	if [ x"$NEW" != x ] ; then
 		OLD=$(                                    mosquitto_sub $_MOSQUITTO_PARAMS_ -W 1 -C 1   )
