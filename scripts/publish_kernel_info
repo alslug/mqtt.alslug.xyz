@@ -1,20 +1,16 @@
 #!/bin/bash
 
 _USER_=$( ( awk '/-u / { print $2 }' < $HOME/.config/mosquitto.mqtt.alslug.xyz.conf ; echo user ) | head -1 )
-_HOSTNAME_=$( hostname )
-_MOSQUITTO_PARAMS_="--host mqtt.alslug.xyz -u $_USER_"
 
 function update {
-	TOPIC=computers/$_USER_/$_HOSTNAME_/$1
+	_MOSQUITTO_PARAMS_="--host mqtt.alslug.xyz -u $_USER_ -topic "computers/$_USER_/$( hostname )/$1
 	NEW=$2
-	OLD=$3
 	if [ x"$NEW" != x ] ; then
-		OLD=$( mosquitto_sub -W 1 -C 1                          $_MOSQUITTO_PARAMS_ --topic $TOPIC	)
-		[ x"$NEW" != x"$OLD" ] && echo "$NEW"	| mosquitto_pub	$_MOSQUITTO_PARAMS_ --topic $TOPIC -s --retain
+		OLD=$(                                    mosquitto_sub $_MOSQUITTO_PARAMS_ -W 1 -C 1   )
+		[ x"$NEW" != x"$OLD" ] && ( echo "$NEW" | mosquitto_pub $_MOSQUITTO_PARAMS_ -s --retain )
 	fi
 }
 
-for CMD_A in uname                                              ; do NEW=$( $CMD_A -a)                                                        ; update $CMD_A               "$NEW" ; done
-for PARAM in id description release codename                    ; do NEW=$( lsb_release --$PARAM )                                            ; update lsb_release/$PARAM   "$NEW" ; done
-for PACKAGE in linux-image-generic $( dpkg linux-image-rpi-\* ) ; do NEW=$( dpkg -l $PACKAGE | awk '/'$PACKAGE'/ { print $3 }'	2>/dev/null ) ; update $PACKAGE             "$NEW" ; done 2>/dev/null 
-
+for CMD_A in uname                                              ; do NEW=$( $CMD_A -a)                                                        ; update $CMD_A              "$NEW" ; done
+for PARAM in id description release codename                    ; do NEW=$( lsb_release --$PARAM )                                            ; update lsb_release/$PARAM  "$NEW" ; done
+for PACKAGE in linux-image-generic $( dpkg linux-image-rpi-\* ) ; do NEW=$( dpkg -l $PACKAGE | awk '/'$PACKAGE'/ { print $3 }'	2>/dev/null ) ; update $PACKAGE            "$NEW" ; done 2>/dev/null
