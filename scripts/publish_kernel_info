@@ -1,6 +1,6 @@
 #!/bin/bash
 
-_USER_=$( ( awk '/-u / { print $2 }' < $HOME/.config/mosquitto.amqtt.alslug.xyz ; echo user ) | head -1 )
+_USER_=$( ( awk '/-u / { print $2 }' < $HOME/.config/mosquitto.mqtt.alslug.xyz ; echo user ) | head -1 )
 _HOSTNAME_=$( hostname )
 _MOSQUITTO_PARAMS_="--host mqtt.alslug.xyz -u $_USER_"
 
