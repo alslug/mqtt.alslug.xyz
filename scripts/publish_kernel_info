@@ -3,18 +3,30 @@
 _USER_=$( ( awk '/-u / { print $2 }' < $HOME/.config/mosquitto_pub ; echo user ) | head -1 )
 _HOSTNAME_=$( hostname )
 
-TOPIC=computers/$_USER_/$_HOSTNAME_/uname
-NEW=$( uname -a)
-OLD=$( mosquitto_sub -W 1 -C 1				--topic $TOPIC	)
-[ x"$NEW" != x"$OLD" ] && echo "$NEW"	| mosquitto_pub	--topic $TOPIC -s --retain
+function update {
+	TOPIC=$1
+	NEW=$2
+	OLD=$3
+	if [ x"$NEW" != x ] ; then
+		OLD=$( mosquitto_sub -W 1 -C 1			--topic $TOPIC	)
+		[ x"$NEW" != x"$OLD" ] && echo "$NEW"	| mosquitto_pub	--topic $TOPIC -s --retain
+	fi
+}
 
+for CMD_A in uname ; do
+	TOPIC=computers/$_USER_/$_HOSTNAME_/$CMD_A
+	NEW=$( $CMD_A -a)
+	update "$TOPIC" "$NEW"
+done
+
+for PARAM in id description release codename ; do
+	TOPIC=computers/$_USER_/$_HOSTNAME_/lsb_release/$PARAM
+	NEW=$( lsb_release --$PARAM )
+	update "$TOPIC" "$NEW"
+done
 
 for PACKAGE in linux-image-generic $( dpkg linux-image-rpi-\* 2>/dev/null ) ; do
 	TOPIC=computers/$_USER_/$_HOSTNAME_/$PACKAGE
 	NEW=$( dpkg -l $PACKAGE | awk '/'$PACKAGE'/ { print $3 }'	2>/dev/null )
-	if [ x"$NEW" != x ] ; then
-		OLD=$( mosquitto_sub -W 1 -C 1				--topic $TOPIC	)
-		[ x"$NEW" != x ] &&
-		[ x"$NEW" != x"$OLD" ] && echo "$NEW"	| mosquitto_pub	--topic $TOPIC -s --retain
-	fi
+	update "$TOPIC" "$NEW"
 done
