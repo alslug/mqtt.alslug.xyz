@@ -11,6 +11,6 @@ function update {
 	fi
 }
 
-for CMD_A in uname                                              ; do NEW=$( $CMD_A -a)                                                        ; update $CMD_A              "$NEW" ; done
-for PARAM in id description release codename                    ; do NEW=$( lsb_release --$PARAM )                                            ; update lsb_release/$PARAM  "$NEW" ; done
+for CMD_A in uname                                              ; do NEW=$( $CMD_A -a)                                                        ; update $CMD_A              "$NEW" ; done 2>/dev/null
+for PARAM in id description release codename                    ; do NEW=$( lsb_release --$PARAM )                                            ; update lsb_release/$PARAM  "$NEW" ; done 2>/dev/null
 for PACKAGE in linux-image-generic $( dpkg linux-image-rpi-\* ) ; do NEW=$( dpkg -l $PACKAGE | awk '/'$PACKAGE'/ { print $3 }'	2>/dev/null ) ; update $PACKAGE            "$NEW" ; done 2>/dev/null
